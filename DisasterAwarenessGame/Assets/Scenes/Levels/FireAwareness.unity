@@ -24085,7 +24085,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4141127370337367350, guid: 7e9313eb983d17940a3ab3a82006e7f6, type: 3}
       propertyPath: fadeDuration
-      value: 0.1
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 4141127370337367350, guid: 7e9313eb983d17940a3ab3a82006e7f6, type: 3}
       propertyPath: winLoseCanvas
