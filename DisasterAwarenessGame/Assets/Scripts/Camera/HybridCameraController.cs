@@ -34,6 +34,7 @@ public class HybridCameraController : MonoBehaviour
     public TextMeshProUGUI headerText;
     public TextMeshProUGUI positiveChoiceText;
     public TextMeshProUGUI negativeChoiceText;
+    public Button SequenceHiderButton;
 
     [Header("OnGameEnd Canvas")]
     public GameObject winLoseCanvas;
@@ -60,6 +61,8 @@ public class HybridCameraController : MonoBehaviour
 
     private void Update()
     {
+        if (SequenceManager.instance.isProceeding) return;
+
         if(GyroEnabled && CameraState == CameraState.Freeform)
         {
             Quaternion gyroRotation = Gyro.attitude;
@@ -206,5 +209,17 @@ public class HybridCameraController : MonoBehaviour
     {
         winLoseCanvas.SetActive(true);
         winLoseCanvas.GetComponent<WinLose>().SetRemark(SequenceManager.instance.sequences[SequenceManager.instance.currentSequence - 1].remarkText);
+    }
+
+    public void ShowHideSequence()
+    {
+        if (sequenceChoiceGO.gameObject.activeInHierarchy)
+        {
+            sequenceChoiceGO.SetActive(false);
+        }
+        else
+        {
+            sequenceChoiceGO.SetActive(true);
+        }
     }
 }

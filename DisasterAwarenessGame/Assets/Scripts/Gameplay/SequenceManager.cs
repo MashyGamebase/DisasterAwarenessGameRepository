@@ -47,6 +47,8 @@ public class SequenceManager : MonoBehaviour
 
     public static SequenceManager instance;
 
+    public bool isProceeding = false;
+
     private void Awake()
     {
         instance = this;
@@ -59,11 +61,14 @@ public class SequenceManager : MonoBehaviour
 
     public void ProceedSequence()
     {
-        if(currentSequence >= targetSequence)
+        HybridCameraController.instance.SequenceHiderButton.interactable = false;
+        if (currentSequence >= targetSequence)
         {
             HybridCameraController.instance.GameOver();
             return;
         }
+
+        isProceeding = true;
 
         if (sequences[currentSequence].shouldFade)
         {
@@ -87,6 +92,8 @@ public class SequenceManager : MonoBehaviour
             .OnComplete(() =>
             {
                 HybridCameraController.instance.SetTextNext(sequences[currentSequence].headerText, sequences[currentSequence].positiveChoiceText, sequences[currentSequence].negativeChoiceText, sequences[currentSequence].isNextGameOver);
+                HybridCameraController.instance.SequenceHiderButton.interactable = true;
+                isProceeding = false;
                 currentSequence++;
             });
         });
