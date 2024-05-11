@@ -146,24 +146,3 @@ public class SequenceManager : MonoBehaviour
     }
     #endregion
 }
-
-#region EDITOR_FUNCTIONS
-/// <summary>
-/// For debugging purposes only
-/// </summary>
-[CustomEditor(typeof(SequenceManager))]
-public class SequenceManagerEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        SequenceManager sequenceManager = (SequenceManager)target;
-
-        DrawDefaultInspector();
-
-        if (GUILayout.Button("ProceedSequence"))
-        {
-            sequenceManager.ProceedSequence();
-        }
-    }
-}
-#endregion

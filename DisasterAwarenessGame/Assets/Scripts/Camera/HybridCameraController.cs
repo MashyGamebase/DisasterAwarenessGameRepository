@@ -14,9 +14,9 @@ public enum CameraState
 
 public class HybridCameraController : MonoBehaviour
 {
-    private bool GyroEnabled;
-    private Gyroscope Gyro;
-    public CameraState CameraState = CameraState.Freeform;
+    //private bool GyroEnabled;
+    //private Gyroscope Gyro;
+    //public CameraState CameraState = CameraState.Freeform;
 
     private Vector2 touchStartPos;
     private Vector3 lastMousePos;
@@ -39,6 +39,10 @@ public class HybridCameraController : MonoBehaviour
     [Header("OnGameEnd Canvas")]
     public GameObject winLoseCanvas;
 
+    [Header("Audio")]
+    public AudioSource source;
+    public AudioClip clip;
+
     private void Awake()
     {
         instance = this;
@@ -46,60 +50,36 @@ public class HybridCameraController : MonoBehaviour
 
     private void Start()
     {
-        GyroEnabled = SystemInfo.supportsGyroscope;
-
-        if (GyroEnabled)
-        {
-            Gyro = Input.gyro;
-            Gyro.enabled = true;
-        }
-        else
-        {
-            Debug.LogWarning("Gyroscope not available on this device.");
-        }
     }
 
     private void Update()
     {
         if (SequenceManager.instance.isProceeding) return;
-
-        if(GyroEnabled && CameraState == CameraState.Freeform)
-        {
-            Quaternion gyroRotation = Gyro.attitude;
-
-            gyroRotation.z = 0f;
-            gyroRotation.w = 0f;
-
-            transform.rotation = Quaternion.Euler(gyroRotation.eulerAngles.y, gyroRotation.eulerAngles.x, 0f);
-        }
-        else if(CameraState == CameraState.Touch)
-        {
 #if UNITY_ANDROID
-            if (Input.touchCount > 0)
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            switch (touch.phase)
             {
-                Touch touch = Input.GetTouch(0);
+                case TouchPhase.Began:
+                    touchStartPos = touch.position;
+                    break;
 
-                switch (touch.phase)
-                {
-                    case TouchPhase.Began:
-                        touchStartPos = touch.position;
-                        break;
+                case TouchPhase.Moved:
+                    // Calculate swipe distance
+                    float swipeDistance = touch.position.x - touchStartPos.x;
 
-                    case TouchPhase.Moved:
-                        // Calculate swipe distance
-                        float swipeDistance = touch.position.x - touchStartPos.x;
-
-                        // Apply rotation based on swipe distance
-                        float rotationAmount = swipeDistance * rotationSpeed * Time.deltaTime;
-                        transform.Rotate(Vector3.up, rotationAmount);
-                        break;
-                }
+                    // Apply rotation based on swipe distance
+                    Vector3 delta = touch.position - touchStartPos;
+                    RotateCamera(delta);
+                    break;
             }
+        }
 #endif
 #if UNITY_EDITOR
-            MouseRotateCamera();
+        MouseRotateCamera();
 #endif
-        }
     }
     #region EDITOR_INPUT
     void MouseRotateCamera()
@@ -121,18 +101,23 @@ public class HybridCameraController : MonoBehaviour
             RotateCamera(delta);
         }
     }
-
+    #endregion
     void RotateCamera(Vector3 delta)
     {
         // Sensitivity factor for rotation
-        float sensitivity = 0.1f;
+        float sensitivity = 0.05f;
 
         // Rotate the camera around the appropriate axis
-        transform.Rotate(Vector3.up, -delta.x * sensitivity, 0f);
-        transform.Rotate(transform.right, delta.y * sensitivity, 0f);
-    }
-    #endregion
 
+        float newXRotation = transform.eulerAngles.x - delta.y * sensitivity;
+        float newYRotation = transform.eulerAngles.y + delta.x * sensitivity;
+        float clampedXRotation = Mathf.Clamp(newXRotation, -90f, 90f);
+
+        transform.rotation = Quaternion.Euler(newXRotation, newYRotation, 0);
+    }
+
+
+    /*
     public void OnClick_SwitchCameraControl()
     {
         if (CameraState == CameraState.Freeform)
@@ -140,6 +125,7 @@ public class HybridCameraController : MonoBehaviour
         else
             CameraState = CameraState.Freeform;
     }
+    */
 
     public void StartFade()
     {
@@ -213,6 +199,7 @@ public class HybridCameraController : MonoBehaviour
 
     public void ShowHideSequence()
     {
+        source.PlayOneShot(clip);
         if (sequenceChoiceGO.gameObject.activeInHierarchy)
         {
             sequenceChoiceGO.SetActive(false);

@@ -11,4 +11,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Levels/FireAwareness.unity
     guid: 79fe88e65453f8a4d940cab655a20839
+  - enabled: 1
+    path: Assets/Scenes/Levels/EarthquakeAwareness.unity
+    guid: 712cd97a55fd7cc488e413e0626a8f3d
+  - enabled: 1
+    path: Assets/Scenes/Levels/TyphoonAwareness.unity
+    guid: 59cde6554aef93a42803435df0e9b7a8
   m_configObjects: {}
